@@ -5,7 +5,7 @@ from modules.login import login
 
 df = pd.read_excel('company_list.xlsx')
 driver = setup_driver()
-i = 1
+i = 0
 df['STATUS'] = ''
 
 for index, row in df.iterrows():
