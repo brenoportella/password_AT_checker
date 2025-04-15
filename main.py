@@ -1,25 +1,41 @@
+import time
+
 import pandas as pd
 
-from modules.driver import quit_driver, setup_driver
-from modules.login import login
+from src.defines import *
+from src.driver import quit_driver, setup_driver
+from src.log_config import logger
+from src.login import login
 
-df = pd.read_excel('company_list.xlsx')
-driver = setup_driver()
-i = 0
-df['STATUS'] = ''
 
-for index, row in df.iterrows():
+def main():
+    df = pd.read_excel(INPUT_FILE, dtype={'NIF': str, 'PASSWORD': str})
+    driver = setup_driver()
+    i = 0
+    df['STATUS'] = ''
 
-    nif = row['NIF']
-    password = row['PASSWORD']
+    for index, row in df.iterrows():
 
-    print(f'Tentando login para NIF: {nif}')
-    status = login(driver, nif, password)
-    df.at[index, 'STATUS'] = status
-    i += 1
-    if i % 10 == 0:
-        df.to_excel('company_list_output.xlsx', index=False)
+        nif = row['NIF']
+        password = row['PASSWORD']
 
-df.to_excel('company_list_output.xlsx', index=False)
-print('Processo concluído. Status salvo no Excel.')
-quit_driver(driver)
+        logger.info(f'Trying loggin {nif} | {i}')
+        driver.delete_all_cookies()
+        status = login(driver, nif, password)
+        df.at[index, 'STATUS'] = status
+        logger.info(f'{nif} | {status}')
+        i += 1
+        if i % 10 == 0:
+            df.to_excel(OUTPUT_FILE, index=False)
+        time.sleep(2)
+        if i % 50 == 0:
+            quit_driver(driver)
+            driver = setup_driver()
+
+    df.to_excel(OUTPUT_FILE, index=False)
+    logger.info('PROCESS FINISHED. CHECK OUTPUT FILE')
+    quit_driver(driver)
+
+
+if __name__ == '__main__':
+    main()
