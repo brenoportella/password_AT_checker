@@ -1,4 +1,6 @@
 # PASSWORD AT CHECKER (PORTUGAL)
+A script to check the status of passwords from AT (Portugal). 
+### Requirements
 
 Before starting, make sure you have Python and pip installed on your system.
 - You can check by running:
